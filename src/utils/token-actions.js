@@ -1,8 +1,8 @@
 const jwt = require("jsonwebtoken");
 const keys = require("../config/keys");
-const { createToken } = require("./token-actions");
+const UserDB = require('../db-models/User');
 
-module.exports.createToken = (user, expiresIn, tokenType) => {
+const createToken = (user, expiresIn, tokenType) => {
     return jwt.sign(
         {
             userId: user._id,
@@ -22,5 +22,16 @@ module.exports.getBearerTokenForActions = (user) => {
 }
 
 module.exports.getBearerTokenForAuthorize = (user) => {
-    return `Bearer ${createToken(user,  60 * 60 * 24 * 30, "AUTHORIZATION")}`;
+    return `${createToken(user,  60 * 60 * 24 * 30, "AUTHORIZATION")}`;
+}
+
+module.exports.parseAuthToken = async (token) => {
+    if (!token) return undefined;
+
+    const parsedToken = jwt.decode(token);
+    if (parsedToken.tokenType === 'AUTHORIZATION') {
+        return UserDB.findById(parsedToken.userId);
+    }
+
+    return undefined;
 }

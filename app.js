@@ -22,8 +22,8 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 app.use(passport.initialize());
-require('./src/middleweare/passport')(passport);
-
+const myPassport = require('./src/middleweare/passport');
+myPassport(passport);
 
 const authRoutes = require('./src/routes/auth');
 const groupRoutes = require('./src/routes/group');

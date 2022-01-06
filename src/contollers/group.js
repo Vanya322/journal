@@ -4,7 +4,7 @@ const { GroupDto } = require("../models/Group");
 
 module.exports.getAllGroups = async (req, res) => {
     try {
-        const groups = GroupDB.find();
+        const groups = await GroupDB.find();
         const groupsDtp = groups.map(async (it) => await GroupDto.toDto(it));
         res.status(200).json(groupsDtp)
     } catch (e) {
