@@ -4,11 +4,11 @@ mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 
-const subjectSchema = new Schema({
+const scienceSchema = new Schema({
     name: {
         type: String,
         required: true
     },
 })
 
-module.exports = mongoose.model('subject', subjectSchema);
+module.exports = mongoose.model('science', scienceSchema);

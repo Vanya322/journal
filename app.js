@@ -26,7 +26,9 @@ require('./src/middleweare/passport')(passport);
 
 
 const authRoutes = require('./src/routes/auth');
+const groupRoutes = require('./src/routes/group');
 
 app.use('/api/auth', authRoutes);
+app.use('/api/groups', groupRoutes);
 
 module.exports = app;

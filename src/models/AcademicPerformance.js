@@ -1,12 +1,14 @@
-import studentsModel from "../db-models/Student";
-import { Student } from "./Student";
+const StudentDto = require("./Student").StudentDto
+const studentsModel = require("../db-models/Student")
 
-export class AcademicPerformanceDto {
+module.exports = class AcademicPerformanceDto {
     constructor(
+        id,
         student,
         date,
         performance,
     ) {
+        this.id = id;
         this.student = student;
         this.date = date;
         this.performance = performance;
@@ -16,9 +18,10 @@ export class AcademicPerformanceDto {
         const allStudents = await studentsModel.find();
 
         const student = allStudents.find((it) => data.studentId === it._id)
-            .map((it) => Student.toDto(it));
+            .map((it) => StudentDto.toDto(it));
 
         return new AcademicPerformanceDto(
+            data._id,
             student,
             data.date,
             data.performance,

@@ -1,65 +1,70 @@
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 
-const User = require('../db-models/User');
-const keys = require('../config/keys')
+const UserDB = require('../db-models/User');
+
+const tokenActions = require("../utils/token-actions")
 const errorHandler = require('../utils/error-handler')
 
 module.exports.login = async (req, res) => {
+    try {
+        const email = (req.user || {}).email || req.body.email;
 
-    const candidate = await User.findOne({
-        email: req.body.email,
-    });
+        if(!email) {
+            res.status(404).json({
+                message: 'Почта не найдена!'
+            })
+            return;
+        }
 
-    const passwordCheck = bcrypt.compareSync(req.body.password, candidate.password); // Шифруем пароль
+        const user = await UserDB.findOne({
+            email,
+        });
 
-    if(candidate && passwordCheck) {
+        const passwordCheck = bcrypt.compareSync(req.body.password, user.password);
 
-        const token = jwt.sign(
-            {
-                email: candidate.email,
-                userId: candidate._id,
-            },
-            keys.jwt,
-            {
-                expiresIn: 60 * 60 * 24 * 30
-            }
-        );
+        if (!user || !passwordCheck) {
+            res.status(404).json({
+                message: 'Пользователь не найден!'
+            })
+            return;
+        }
 
         res.status(200).json({
-            token: `Bearer ${token}`
+            user,
+            authorizeToken: !req.user ? tokenActions.getBearerTokenForAuthorize(user) : null,
+            token: tokenActions.getBearerTokenForActions(user),
         })
+    } catch (e) {
+        errorHandler(res, e);
     }
-    else {
-        res.status(404).json({
-            message: 'This user not found!'
-        })
-    }
-
 }
 
 module.exports.register = async (req, res) => {
+    try {
+        const foundUser = await UserDB.findOne({email: req.body.email});
 
-    const candidate = await User.findOne({email: req.body.email});
+        if(foundUser) {
+            res.status(409).json({
+                message: 'Такая почта уже зарегистрирована!'
+            })
+            return;
+        }
 
-    if(candidate) {
-        res.status(409).json({
-            message: 'User with this email already exists!'
-        })
-    }
-    else {
-        const user = new User({
+        const user = new UserDB({
+            name: req.body.name,
             email: req.body.email,
             password: bcrypt.hashSync(req.body.password, bcrypt.genSaltSync(10)),
+            type: req.body.type,
         });
 
-        try {
-            await user.save();
-            res.status(201).json(user)
-        }
-        catch(e) {
-            errorHandler(res, e);
-        }
-
+        await user.save();
+        res.status(201).json({
+            user,
+            authorizeToken: tokenActions.getBearerTokenForAuthorize(user),
+            token: tokenActions.getBearerTokenForActions(user),
+        })
+    }
+    catch(e) {
+        errorHandler(res, e);
     }
 }

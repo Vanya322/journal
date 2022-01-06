@@ -2,7 +2,7 @@ const passportJwt = require('passport-jwt');
 const JwtStrategy = passportJwt.Strategy;
 const ExtractJwt = passportJwt.ExtractJwt;
 
-const User = require('../db-models/User');
+const UserDB = require('../db-models/User');
 
 const keys = require('../config/keys');
 
@@ -18,9 +18,10 @@ module.exports = (passport) => {
             console.log('payload', payload)
 
             try {
-                const user = await User.findById(payload.userId)
+                const user = await UserDB.findById(payload.userId)
                     .select('email id');
 
+                console.log("PASS", user);
                 if(user) {
                     done(null, user);
                 }

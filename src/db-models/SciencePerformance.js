@@ -4,18 +4,19 @@ mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 
-const groupSchema = new Schema({
-    name: {
-        type: String,
+const sciencePerformanceSchema = new Schema({
+    scienceId: {
+        ref: 'science',
+        type: Schema.Types.ObjectId,
         required: true
     },
-    sciencePerformances: [
+    academicPerformances: [
         {
-            ref: 'sciencePerformance',
+            ref: 'academicPerformance',
             type: Schema.Types.ObjectId,
             required: true
         }
-    ]
+    ],
 })
 
-module.exports = mongoose.model('group', groupSchema);
+module.exports = mongoose.model('sciencePerformance', sciencePerformanceSchema);

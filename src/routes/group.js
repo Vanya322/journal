@@ -1,26 +1,31 @@
 const express = require('express');
 const passport = require('passport');
 const router = express.Router();
+const controller = require("../contollers/group");
 
 router.get('/',
     passport.authenticate('jwt', { session: false }),
-    controller.getAll
+    controller.getAllGroups
 );
-router.get('/:id', controller.getById);
+
+router.get('/:id',
+    passport.authenticate('jwt', { session: false }),
+    controller.getGroupById
+);
 
 router.delete('/:id',
     passport.authenticate('jwt', { session: false }),
-    controller.remove
+    controller.removeGroup
 );
 
 router.post('/',
     passport.authenticate('jwt', { session: false }),
-    controller.create
+    controller.createGroup
 );
 
 router.put('/:id',
     passport.authenticate('jwt', { session: false }),
-    controller.update
+    controller.updateGroup
 );
 
 module.exports = router;
