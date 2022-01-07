@@ -1,8 +1,8 @@
 const ScienceDB = require("../db-models/Science")
 const errorHandler = require('../utils/error-handler')
-const { ScienceDto } = require("../models/Science");
+const ScienceDto = require("../models/Science");
 
-module.exports.getAllScience = async (req, res) => {
+module.exports.getAllSciences = async (req, res) => {
     try {
         const sciences = await ScienceDB.find();
         res.status(200).json(sciences.map((it) => ScienceDto.toDto(it)));
@@ -57,7 +57,7 @@ module.exports.removeScience = async (req, res) => {
     try {
         await ScienceDB.findByIdAndRemove(req.params.id);
 
-        res.status(200);
+        res.status(200).json();
     } catch (e) {
         errorHandler(res, e);
     }

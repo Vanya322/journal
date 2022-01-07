@@ -1,28 +1,35 @@
 const sciencePerformancesModel = require('../db-models/SciencePerformance');
-const SciencePerformanceDto = require("./SciencePerformance").SciencePerformanceDto
+const SciencePerformanceDto = require("./SciencePerformance")
 
 module.exports = class GroupDto {
     constructor(
         id,
         name,
+        dateStart,
+        dateEnd,
         sciencePerformances,
     ) {
         this.id = id;
         this.name = name;
+        this.dateStart = dateStart;
+        this.dateEnd = dateEnd;
         this.sciencePerformances = sciencePerformances;
     }
 
     static async toDto(data) {
-        const allSciencePerformances = await sciencePerformancesModel.find();
+        const sciencePerformances = await sciencePerformancesModel.find({ groupId: data.groupId });
 
-        const sciencePerformances = allSciencePerformances.filter((it) => (
-            data.sciencePerformances.includes(it._id)
-        )).map(async (it) => await SciencePerformanceDto.toDto(it));
+        const sciencePerformancesDto = sciencePerformances.map(async (it) => {
+            const sciencePerformance = await SciencePerformanceDto.toDto(it);
+            return sciencePerformance;
+        });
 
         return new GroupDto(
             data._id,
             data.name,
-            sciencePerformances,
+            data.dateStart,
+            data.dateEnd,
+            sciencePerformancesDto,
         );
     }
 }

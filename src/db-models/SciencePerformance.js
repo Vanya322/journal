@@ -10,6 +10,11 @@ const sciencePerformanceSchema = new Schema({
         type: Schema.Types.ObjectId,
         required: true
     },
+    groupId: {
+        ref: 'group',
+        type: Schema.Types.ObjectId,
+        required: true
+    },
     academicPerformances: [
         {
             ref: 'academicPerformance',

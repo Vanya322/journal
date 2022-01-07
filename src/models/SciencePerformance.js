@@ -1,8 +1,8 @@
-const AcademicPerformanceDto = require("./AcademicPerformance").AcademicPerformanceDto
-const ScienceDto = require("./Science").ScienceDto
+const AcademicPerformanceDto = require("./AcademicPerformance")
+const ScienceDto = require("./Science")
 
-const sciencesModel = require('../db-models/Science');
-const academicPerformancesModel = require('../db-models/AcademicPerformance');
+const SciencesDB = require('../db-models/Science');
+const AcademicPerformancesDB = require('../db-models/AcademicPerformance');
 
 module.exports = class SciencePerformanceDto {
     constructor(
@@ -16,12 +16,12 @@ module.exports = class SciencePerformanceDto {
     }
 
     static async toDto(data) {
-        const allAcademicPerformances= await academicPerformancesModel.find();
+        const allAcademicPerformances= await AcademicPerformancesDB.find();
         const academicPerformances = allAcademicPerformances.filter((itemId) => (
             data.academicPerformances.includes(itemId)
         ));
 
-        const science = await sciencesModel.findById(data.scienceId);
+        const science = await SciencesDB.findById(data.scienceId);
 
         return new SciencePerformanceDto(
             data._id,

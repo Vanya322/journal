@@ -1,12 +1,19 @@
 const GroupDB = require("../db-models/Group")
 const errorHandler = require('../utils/error-handler')
-const { GroupDto } = require("../models/Group");
+const GroupDto = require("../models/Group");
+const SciencePerformanceDB = require("../db-models/SciencePerformance");
+const AcademicPerformanceDB = require("../db-models/AcademicPerformance");
 
 module.exports.getAllGroups = async (req, res) => {
     try {
         const groups = await GroupDB.find();
-        const groupsDtp = groups.map(async (it) => await GroupDto.toDto(it));
-        res.status(200).json(groupsDtp)
+        const groupsDto = [];
+        for(let i = 0; i < groups.length; i++ ) {
+            const groupDto = await GroupDto.toDto(groups[i]);
+            groupsDto.push(groupDto)
+        }
+
+        res.status(200).json(groupsDto)
     } catch (e) {
         errorHandler(res, e);
     }
@@ -14,9 +21,9 @@ module.exports.getAllGroups = async (req, res) => {
 
 module.exports.getGroupById = async (req, res) => {
     try {
-        const group = GroupDB.findById(req.params.id);
-        const groupDtp = await GroupDto.toDto(group);
-        res.status(200).json(groupDtp)
+        const group = await GroupDB.findById(req.params.id);
+        const groupDto = await GroupDto.toDto(group);
+        res.status(200).json(groupDto)
     } catch (e) {
         errorHandler(res, e);
     }
@@ -41,6 +48,8 @@ module.exports.createGroup = async (req, res) => {
 
         const group = new GroupDB({
             name: req.body.name,
+            dateStart: req.body.dateStart,
+            dateEnd: req.body.dateEnd,
             sciencePerformances: req.body.sciencePerformances,
         });
 
@@ -61,6 +70,8 @@ module.exports.updateGroup = async (req, res) => {
         },
         {
             name: req.body.name,
+            dateStart: req.body.dateStart,
+            dateEnd: req.body.dateEnd,
             sciencePerformances: req.body.sciencePerformances,
         });
         const group = await GroupDB.findById(req.params.id);
@@ -74,9 +85,20 @@ module.exports.updateGroup = async (req, res) => {
 
 module.exports.removeGroup = async (req, res) => {
     try {
+        const sciencePerformances = await SciencePerformanceDB.find({ groupId: req.params.id });
+        for(let i = 0; i < sciencePerformances.length; i++) {
+            const sciencePerformance = sciencePerformances[i]
+
+            for(let j = 0; j < sciencePerformance.academicPerformances.length; j++) {
+                const itemId = sciencePerformance.academicPerformances[j];
+                await AcademicPerformanceDB.findByIdAndRemove(itemId);
+            }
+            await SciencePerformanceDB.findByIdAndRemove(sciencePerformance._id);
+        }
+
         await GroupDB.findByIdAndRemove(req.params.id);
 
-        res.status(200);
+        res.status(200).json();
     } catch (e) {
         errorHandler(res, e);
     }

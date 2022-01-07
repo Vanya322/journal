@@ -9,11 +9,7 @@ const groupSchema = new Schema({
         type: String,
         required: true
     },
-    dateStart: {
-        type: String,
-        required: true
-    },
-    dateEnd: {
+    date: {
         type: String,
         required: true
     },
@@ -26,4 +22,4 @@ const groupSchema = new Schema({
     ]
 })
 
-module.exports = mongoose.model('group', groupSchema);
+module.exports = mongoose.model('groupHistory', groupSchema);

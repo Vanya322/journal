@@ -5,6 +5,11 @@ mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 
 const academicPerformanceSchema = new Schema({
+    sciencePerformanceId: {
+        ref: 'sciencePerformance',
+        type: Schema.Types.ObjectId,
+        required: true
+    },
     studentId: {
         ref: 'student',
         type: Schema.Types.ObjectId,

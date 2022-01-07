@@ -1,5 +1,5 @@
-const StudentDto = require("./Student").StudentDto
-const studentsModel = require("../db-models/Student")
+const StudentDto = require("./Student")
+const StudentsDB = require("../db-models/Student")
 
 module.exports = class AcademicPerformanceDto {
     constructor(
@@ -15,14 +15,11 @@ module.exports = class AcademicPerformanceDto {
     }
 
     static async toDto(data) {
-        const allStudents = await studentsModel.find();
-
-        const student = allStudents.find((it) => data.studentId === it._id)
-            .map((it) => StudentDto.toDto(it));
+        const student = await StudentsDB.findById(data.studentId);
 
         return new AcademicPerformanceDto(
             data._id,
-            student,
+            StudentDto.toDto(student),
             data.date,
             data.performance,
         );
