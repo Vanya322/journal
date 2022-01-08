@@ -15,13 +15,6 @@ const sciencePerformanceSchema = new Schema({
         type: Schema.Types.ObjectId,
         required: true
     },
-    academicPerformances: [
-        {
-            ref: 'academicPerformance',
-            type: Schema.Types.ObjectId,
-            required: true
-        }
-    ],
 })
 
 module.exports = mongoose.model('sciencePerformance', sciencePerformanceSchema);

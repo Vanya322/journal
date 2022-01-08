@@ -17,12 +17,12 @@ module.exports.getAllAcademicPerformances = async (req, res) => {
 }
 module.exports.createAcademicPerformance = async (req, res) => {
     try {
-        const foundAcademicPerformance = await AcademicPerformanceDB.find({
+        const foundAcademicPerformances = await AcademicPerformanceDB.find({
             sciencePerformanceId: req.body.sciencePerformanceId,
             studentId: req.body.studentId,
             date: req.body.date,
         })
-        if (foundAcademicPerformance) {
+        if (foundAcademicPerformances.length) {
             res.status(409).json({
                 message: 'Ошибка!'
             });
@@ -55,7 +55,8 @@ module.exports.updateAcademicPerformance = async (req, res) => {
         });
         const academicPerformance = await AcademicPerformanceDB.findById(req.params.id);
 
-        res.status(200).json(AcademicPerformanceDto.toDto(academicPerformance));
+        const academicPerformanceDto = await AcademicPerformanceDto.toDto(academicPerformance);
+        res.status(200).json(academicPerformanceDto);
     } catch (e) {
         errorHandler(res, e);
     }

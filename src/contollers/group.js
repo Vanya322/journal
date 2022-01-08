@@ -50,7 +50,6 @@ module.exports.createGroup = async (req, res) => {
             name: req.body.name,
             dateStart: req.body.dateStart,
             dateEnd: req.body.dateEnd,
-            sciencePerformances: req.body.sciencePerformances,
         });
 
         await group.save();
@@ -72,9 +71,9 @@ module.exports.updateGroup = async (req, res) => {
             name: req.body.name,
             dateStart: req.body.dateStart,
             dateEnd: req.body.dateEnd,
-            sciencePerformances: req.body.sciencePerformances,
         });
         const group = await GroupDB.findById(req.params.id);
+        console.log(group)
         const groupDto = await GroupDto.toDto(group);
 
         res.status(200).json(groupDto);

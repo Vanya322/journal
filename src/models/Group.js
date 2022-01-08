@@ -17,12 +17,13 @@ module.exports = class GroupDto {
     }
 
     static async toDto(data) {
-        const sciencePerformances = await sciencePerformancesModel.find({ groupId: data.groupId });
+        const sciencePerformances = await sciencePerformancesModel.find({ groupId: data._id });
 
-        const sciencePerformancesDto = sciencePerformances.map(async (it) => {
-            const sciencePerformance = await SciencePerformanceDto.toDto(it);
-            return sciencePerformance;
-        });
+        const sciencePerformancesDto = [];
+        for(let i = 0; i < sciencePerformances.length; i++ ) {
+            const sciencePerformanceDto = await SciencePerformanceDto.toDto(sciencePerformances[i]);
+            sciencePerformancesDto.push(sciencePerformanceDto)
+        }
 
         return new GroupDto(
             data._id,

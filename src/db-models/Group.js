@@ -17,13 +17,6 @@ const groupSchema = new Schema({
         type: String,
         required: true
     },
-    sciencePerformances: [
-        {
-            ref: 'sciencePerformance',
-            type: Schema.Types.ObjectId,
-            required: true
-        }
-    ]
 })
 
 module.exports = mongoose.model('group', groupSchema);

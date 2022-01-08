@@ -19,12 +19,12 @@ module.exports.createStudent = async (req, res) => {
             return;
         }
 
-        const foundStudent = await StudentDB.find({
+        const foundStudents = await StudentDB.find({
             name: req.body.name,
             groupId: req.body.groupId,
             birthday: req.body.birthday,
         });
-        if (foundStudent) {
+        if (foundStudents.length) {
             res.status(409).json({
                 message: 'Такой студент уже состоит в выбранной группе!'
             });

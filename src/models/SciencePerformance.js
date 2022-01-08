@@ -16,17 +16,20 @@ module.exports = class SciencePerformanceDto {
     }
 
     static async toDto(data) {
-        const allAcademicPerformances= await AcademicPerformancesDB.find();
-        const academicPerformances = allAcademicPerformances.filter((itemId) => (
-            data.academicPerformances.includes(itemId)
-        ));
+        const academicPerformances= await AcademicPerformancesDB.find({ sciencePerformanceId: data._id });
+
+        const academicPerformancesDto = [];
+        for(let i = 0; i < academicPerformances.length; i++ ) {
+            const academicPerformanceDto = await AcademicPerformanceDto.toDto(academicPerformances[i]);
+            academicPerformancesDto.push(academicPerformanceDto)
+        }
 
         const science = await SciencesDB.findById(data.scienceId);
 
         return new SciencePerformanceDto(
             data._id,
             ScienceDto.toDto(science),
-            academicPerformances.map(async (it) => await AcademicPerformanceDto.toDto(it)),
+            academicPerformancesDto,
         );
     }
 }
