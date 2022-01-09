@@ -1,6 +1,8 @@
 const ScienceDB = require("../db-models/Science")
 const errorHandler = require('../utils/error-handler')
 const ScienceDto = require("../models/Science");
+const SciencePerformanceDB = require("../db-models/SciencePerformance");
+const AcademicPerformanceDB = require("../db-models/AcademicPerformance");
 
 module.exports.getAllSciences = async (req, res) => {
     try {
@@ -55,6 +57,17 @@ module.exports.updateScience = async (req, res) => {
 
 module.exports.removeScience = async (req, res) => {
     try {
+        const sciencePerformances = await SciencePerformanceDB.find({ scienceId: req.params.id });
+        for(let i = 0; i < sciencePerformances.length; i++) {
+            const sciencePerformance = sciencePerformances[i]
+
+            for(let j = 0; j < sciencePerformance.academicPerformances.length; j++) {
+                const itemId = sciencePerformance.academicPerformances[j];
+                await AcademicPerformanceDB.findByIdAndRemove(itemId);
+            }
+            await SciencePerformanceDB.findByIdAndRemove(sciencePerformance._id);
+        }
+
         await ScienceDB.findByIdAndRemove(req.params.id);
 
         res.status(200).json();

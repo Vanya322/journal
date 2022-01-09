@@ -29,12 +29,18 @@ module.exports.login = async (req, res) => {
         }
 
         const user = await UserDB.findOne({ email });
+        if (!user) {
+            res.status(404).json({
+                message: 'Пользователь не найден!'
+            })
+            return;
+        }
 
         const password = req.body.password;
 
         const passwordCheck = bcrypt.compareSync(password, user.password);
 
-        if (!user || !passwordCheck) {
+        if (!passwordCheck) {
             res.status(404).json({
                 message: 'Пользователь не найден!'
             })
@@ -43,7 +49,7 @@ module.exports.login = async (req, res) => {
 
         res.status(200).json({
             user: UserDto.toDto(user),
-            authorizeToken: tokenActions.getBearerTokenForAuthorize(user),
+            authToken: tokenActions.getBearerTokenForAuthorize(user),
             token: tokenActions.getBearerTokenForActions(user),
         })
     } catch (e) {
@@ -72,7 +78,7 @@ module.exports.register = async (req, res) => {
         await user.save();
         res.status(201).json({
             user: UserDto.toDto(user),
-            authorizeToken: tokenActions.getBearerTokenForAuthorize(user),
+            authToken: tokenActions.getBearerTokenForAuthorize(user),
             token: tokenActions.getBearerTokenForActions(user),
         })
     }
