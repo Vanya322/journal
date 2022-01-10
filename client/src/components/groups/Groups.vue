@@ -10,7 +10,21 @@
           Добавить группу
         </v-btn>
       </v-toolbar>
-
+      <v-card-text>
+        <div class="d-flex">
+          <v-card v-for="group in groups" :key="group.id" class="ma-1 cursor">
+            <router-link :to="`/groups/${group.id}`" class="no-link-style">
+              <v-card-title>
+                {{group.name}}
+              </v-card-title>
+              <v-card-subtitle>
+                <p class="ma-0">Начало обучения: {{group.dateStart}}</p>
+                <p class="ma-0">Конец обучения: {{group.dateEnd}}</p>
+              </v-card-subtitle>
+            </router-link>
+          </v-card>
+        </div>
+      </v-card-text>
     </v-card>
   </v-container>
 </template>
@@ -22,11 +36,21 @@ export default {
   name: "Groups",
 
   computed: {
-    ...mapState("coreModule", ["drawer"])
+    ...mapState("coreModule", ["drawer"]),
+    ...mapState("groupsModule", [
+      "groups",
+      "currentLoading",
+    ])
   },
+
+  mounted() {
+    this.$store.dispatch("groupsModule/loadPage")
+  }
 }
 </script>
 
 <style scoped>
-
+.cursor {
+  cursor: pointer;
+}
 </style>

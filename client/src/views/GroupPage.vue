@@ -1,18 +1,18 @@
 <template>
-  <Journal />
+  <Group />
 </template>
 
 <script>
 export default {
-  name: "JournalPage",
+  name: "GroupsPageId",
 
   routing: {
-    path: "/journals",
+    path: "/groups/:id",
     hasAccess: (user) => user.isAdmin || user.isMember,
   },
 
   components: {
-    Journal: () => import("../components/journal/Journal")
+    Group: () => import("../components/group/Group")
   }
 }
 </script>

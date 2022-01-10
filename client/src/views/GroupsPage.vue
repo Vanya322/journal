@@ -9,7 +9,7 @@ export default {
   routing: {
     routeName: "Группы",
     icon: "mdi-view-dashboard",
-    path: "/",
+    path: "/groups",
     hasAccess: (user) => user.isAdmin || user.isMember,
   },
 

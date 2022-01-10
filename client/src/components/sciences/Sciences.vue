@@ -15,6 +15,7 @@
           :items="[]"
           :loading="false"
           disable-pagination
+          hide-default-footer
       >
         <template v-slot:[`item.actions`]="{ item }">
           <v-icon medium class="mr-2"

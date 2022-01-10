@@ -66,6 +66,10 @@ export default {
 
 <style lang="scss">
 @import "~vuetify/src/components/VStepper/_variables.scss";
+.no-link-style {
+  text-decoration: none !important;
+  color: black !important;
+}
 .drawer-open {
   max-width: calc(100vw - 256px - 12px) !important; /*.container{padding: 12px;}*/
 }

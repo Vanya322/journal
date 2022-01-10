@@ -18,6 +18,7 @@ export default {
     authInProgress: false,
     user: undefined,
     accessToken: undefined,
+    refreshToken: undefined,
   },
   mutations: {
     startAuth(state) {
@@ -46,12 +47,19 @@ export default {
     clearUser(state) {
       state.user = undefined;
       setLocalStorageData(storageAuthKey, "");
+      clearInterval(state.refreshToken);
     },
   },
   actions: {
-    async refreshAccessToken({ commit }) {
+    installRefreshToken({ state, dispatch }) {
+      state.refreshToken = setInterval(() => {
+        dispatch("refreshAccessToken")
+      }, 1000 * 60 * 60)
+    },
+
+    async refreshAccessToken({ state, commit }) {
       try {
-        const { data } = await axios.post(`${API_SERVER}/auth/login`, user);
+        const { data } = await axios.post(`${API_SERVER}/auth/login`, state.user);
         commit("updateAccessToken", data.token)
       }
       catch(e) {
@@ -59,12 +67,13 @@ export default {
       }
     },
 
-    async signIn({ commit }, user) {
+    async signIn({ commit, dispatch }, user) {
       commit("startAuth");
       try {
         const { data } = await axios.post(`${API_SERVER}/auth/login`, user);
         commit("updateUser", data)
         await router.push("/");
+        dispatch("installRefreshToken")
       }
       catch(e) {
         handleHttpError(e);
@@ -72,7 +81,7 @@ export default {
       commit("endAuth");
     },
 
-    async signInWithToken({ commit }, authToken) {
+    async signInWithToken({ commit, dispatch }, authToken) {
       commit("startAuth");
       try {
         const { data } = await axios({
@@ -83,6 +92,7 @@ export default {
           },
         });
         commit("updateUser", data);
+        dispatch("installRefreshToken")
       }
       catch(e) {
         handleHttpError(e);
@@ -90,12 +100,13 @@ export default {
       commit("endAuth");
     },
 
-    async signUp({ commit }, user) {
+    async signUp({ commit, dispatch }, user) {
       commit("startAuth");
       try {
         const data = await axios.post(`${API_SERVER}/auth/register`, user);
         commit("updateUser", data)
         await router.push("/");
+        dispatch("installRefreshToken")
       }
       catch(e) {
         handleHttpError(e);

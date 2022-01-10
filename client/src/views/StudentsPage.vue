@@ -8,7 +8,7 @@ export default {
 
   routing: {
     routeName: "Студенты",
-    icon: "mdi-view-dashboard",
+    icon: "mdi-account-group",
     path: "/students",
     hasAccess: (user) => user.isAdmin,
   },

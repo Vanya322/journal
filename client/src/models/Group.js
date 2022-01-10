@@ -15,7 +15,7 @@ export class Group {
         this.sciencePerformances = sciencePerformances;
     }
 
-    static async fromDto(data) {
+    static fromDto(data) {
         return new Group(
             data.id,
             data.name,

@@ -13,7 +13,7 @@ export class AcademicPerformance {
         this.performance = performance;
     }
 
-    static async fromDto(data) {
+    static fromDto(data) {
         return new AcademicPerformance(
             data.id,
             Student.fromDto(data.student),

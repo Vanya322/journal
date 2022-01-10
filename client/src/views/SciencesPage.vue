@@ -8,7 +8,7 @@ export default {
 
   routing: {
     routeName: "Предметы",
-    icon: "mdi-view-dashboard",
+    icon: "mdi-book-multiple",
     path: "/sciences",
     hasAccess: (user) => user.isAdmin,
   },

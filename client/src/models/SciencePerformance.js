@@ -12,7 +12,7 @@ export class SciencePerformance {
         this.academicPerformances = academicPerformances;
     }
 
-    static async fromDto(data) {
+    static fromDto(data) {
         return new SciencePerformance(
             data.id,
             Science.fromDto(data.science),
