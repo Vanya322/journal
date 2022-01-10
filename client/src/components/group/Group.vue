@@ -9,6 +9,18 @@
           Группа {{targetGroup.name}}
         </v-toolbar-title>
         <v-spacer></v-spacer>
+        <v-btn
+          v-if="user.isAdmin"
+          text
+          small
+          @click="addScience"
+        >Добавить предмет</v-btn>
+        <v-btn
+          v-if="user.isAdmin"
+          text
+          small
+          @click="addStudent"
+        >Добавить студента</v-btn>
         <v-menu
             ref="dateRangeMenu"
             v-model="dateRangeMenu"
@@ -42,7 +54,7 @@
           </template>
           <v-date-picker v-model="selectedDatesRange" range no-title>
             <v-spacer></v-spacer>
-            <v-btn text color="primary" @click="dateRangeMenu = false">
+            <v-btn text @click="dateRangeMenu = false">
               Закрыть
             </v-btn>
             <v-btn
@@ -61,36 +73,39 @@
           >
             <v-tabs-slider color="primary"></v-tabs-slider>
             <v-tab
+                v-if="targetGroup"
                 class="ml-0 black--text"
                 v-for="item in targetGroup.sciencePerformances"
                 :key="item.id"
             >
               {{ item.science.name }}
+              <v-icon small @click="deleteScienceFromGroup(item)">mdi-close</v-icon>
             </v-tab>
           </v-tabs>
         </template>
       </v-toolbar>
       <v-data-table
-          :headers="headers"
-          :items="defaultItems"
-          :loading="false"
-          disable-pagination
-          hide-default-footer
-          disable-sort
+        :headers="headers"
+        :items="items"
+        :loading="false"
+        disable-pagination
+        hide-default-footer
+        disable-sort
       >
-        <template v-slot:[`item.student]="{ item }">
-          {{item.name}}
+        <template v-slot:[`item.student`]="{ item }">
+          {{item.student.name}}
         </template>
 
         <template
             v-for="(date, index) in dateHeaders"
             v-slot:[`item.${date.value}`]="{ item }"
         >
-          <div :key="index">
+          <div :key="index" v-if="targetGroup && targetGroup.sciencePerformances[selectedTab]">
             <EditField
               :academicPerformance="getAcademicPerformance(item.student, date.value)"
               :groupId="targetGroup.id"
-              :sciencePerformanceId="this.targetGroup.sciencePerformances[this.selectedTab].id"
+              :sciencePerformanceId="targetGroup.sciencePerformances[selectedTab].id"
+              @onUpdate="loadTargetGroup"
             />
           </div>
         </template>
@@ -107,13 +122,18 @@
         indeterminate
       ></v-progress-circular>
     </v-overlay>
+    <AddScienceDialog
+      ref="addScienceDialog"
+      :group="targetGroup"
+      @onUpdate="loadTargetGroup"
+    />
+    <AddStudentDialog ref="addStudentDialog" @onUpdate="loadTargetGroup" />
   </v-container>
 </template>
 
-
 <script>
 import { mapState } from "vuex";
-import {dateMomentFormat, defaultDateFormat} from "../../utils/utils"
+import {defaultDateFormat} from "../../utils/utils"
 import moment from "moment";
 import Vue from "vue";
 
@@ -121,7 +141,9 @@ export default {
   name: "Journal",
 
   components: {
-    EditField: () => import("./EditField")
+    EditField: () => import("./EditField"),
+    AddScienceDialog: () => import("./AddScienceDialog"),
+    AddStudentDialog: () => import("../students/EditStudentDialog")
   },
 
   data: () => ({
@@ -132,12 +154,20 @@ export default {
     ],
     dateRangeMenu: false,
     selectedTab: 0,
+    loading: false,
   }),
 
   computed: {
     ...mapState("coreModule", ["drawer"]),
+    ...mapState("userModule", ["user"]),
     dateHeaders() {
       return [...this.headers].splice(1, this.headers.length);
+    },
+
+    items() {
+      return this.targetGroup.sciencePerformances[this.selectedTab]
+        ? this.defaultItems
+        : [];
     },
 
     headers() {
@@ -152,7 +182,7 @@ export default {
 
       for (let m = startDate; m.diff(endDate) <= 0; m.add(1, "days")) {
         headers.push({
-          text: m.format(dateMomentFormat),
+          text: m.format(defaultDateFormat),
           value: m.format(defaultDateFormat),
         });
       }
@@ -162,16 +192,44 @@ export default {
 
     defaultItems() {
       return this.targetGroup
-        ? this.targetGroup.sciencePerformances[this.selectedTab]
-          .academicPerformances
-          .map((it) => ({
-            student: it.student,
+        ? this.targetGroup.students.map((it) => ({
+            student: it,
           }))
         : [];
     },
   },
 
   methods: {
+    addScience() {
+      this.$refs.addScienceDialog.openDialog();
+    },
+
+    addStudent() {
+      this.$refs.addStudentDialog.openDialog({
+        group: this.targetGroup
+      }, true)
+    },
+
+    deleteScienceFromGroup(sciencePerformances) {
+      this.$refs.confirmationDialog.openDialog({
+        header: "Удаление",
+        text: `Вы уверены, что хотите удалить ${sciencePerformances.science.name}?`,
+        cancelText: "Отменить",
+        submitText: `Удалить`,
+        submitColor: "red",
+        onSubmit: async () => {
+          await this.$store.dispatch("sciencePerformancesModule/deleteSciencePerformance", sciencePerformances)
+          await this.loadTargetGroup();
+        },
+      });
+    },
+
+    async loadTargetGroup() {
+      this.loading = true;
+      this.targetGroup = await this.$store.dispatch("groupsModule/loadGroupById", this.$route.params.id)
+      this.loading = false;
+    },
+
     saveDatesRange(range) {
       if (range.length !== 2) {
         Vue.toasted.error(
@@ -208,8 +266,8 @@ export default {
     },
 
     getAcademicPerformance(student, date) {
-      const foundItem = this.targetGroup.sciencePerformances[this.selectedTab]
-          .academicPerformances.find(it => (
+      const sciencePerformance = this.targetGroup.sciencePerformances[this.selectedTab]
+      const foundItem = sciencePerformance.academicPerformances.find(it => (
               it.student.id === student.id
               && moment(it.date).isSame(date)
           ))
@@ -220,8 +278,9 @@ export default {
     }
   },
 
-  async mounted() {
-    this.targetGroup = await this.$store.dispatch("groupsModule/loadGroupById", this.$route.params.id)
+  mounted() {
+    this.loadTargetGroup();
+    this.$store.dispatch("sciencesModule/loadPage");
   }
 }
 </script>

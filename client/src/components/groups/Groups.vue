@@ -1,6 +1,6 @@
 <template>
   <v-container :class="drawer ? 'drawer-open' : 'drawer-closed'">
-    <v-card>
+    <v-card :loading="currentLoading">
       <v-toolbar flat>
         <v-toolbar-title>
           Группы

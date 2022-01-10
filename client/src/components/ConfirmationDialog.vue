@@ -26,7 +26,7 @@ export default {
 
   data: () => ({
     open: false,
-    loading: "",
+    loading: false,
     header: "",
     text: "",
     cancelText: "",

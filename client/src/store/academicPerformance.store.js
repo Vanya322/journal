@@ -1,31 +1,28 @@
 import axios from "axios";
 import {API_SERVER, bodyWithAuthHeader, handleHttpError} from "../utils/utils";
-import { store } from "../main";
+import {AcademicPerformanceDto} from "../models/AcademicPerformance";
 
 export default {
-    name: "academicPerformanceModule",
+    name: "academicPerformancesModule",
     namespaced: true,
     actions: {
         async addOrSave(context, {
             academicPerformance,
-            groupId,
             sciencePerformanceId,
         }) {
             try {
-                const { data } = await axios({
+                await axios({
                     method: academicPerformance.id ? "put" : "post",
                     baseURL: academicPerformance.id
                         ? `${API_SERVER}/academicPerformances/${academicPerformance.id}`
                         : `${API_SERVER}/academicPerformances`,
                     ...bodyWithAuthHeader(),
-                }, {
-                    ...academicPerformance
+
+                    data: {
+                        ...AcademicPerformanceDto.toDto(academicPerformance),
+                        sciencePerformanceId,
+                    }
                 });
-                store.commit("groupsModule/updateAcademicPerformance", {
-                    academicPerformance: data,
-                    groupId,
-                    sciencePerformanceId,
-                })
             }
             catch(e) {
                 handleHttpError(e);

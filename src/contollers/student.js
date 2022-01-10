@@ -1,6 +1,7 @@
 const StudentDB = require("../db-models/Student")
 const errorHandler = require('../utils/error-handler')
 const StudentDto = require("../models/Student");
+const AcademicPerformanceDB = require("../db-models/AcademicPerformance");
 
 module.exports.getAllStudents = async (req, res) => {
     try {
@@ -12,21 +13,9 @@ module.exports.getAllStudents = async (req, res) => {
 }
 module.exports.createStudent = async (req, res) => {
     try {
-        if (!req.body.name || !req.body.groupId || !req.body.birthday) {
+        if (!req.body.name) {
             res.status(404).json({
-                message: 'Не хватает данных!'
-            });
-            return;
-        }
-
-        const foundStudents = await StudentDB.find({
-            name: req.body.name,
-            groupId: req.body.groupId,
-            birthday: req.body.birthday,
-        });
-        if (foundStudents.length) {
-            res.status(409).json({
-                message: 'Такой студент уже состоит в выбранной группе!'
+                message: 'Не указано имя!'
             });
             return;
         }
@@ -35,6 +24,8 @@ module.exports.createStudent = async (req, res) => {
             name: req.body.name,
             groupId: req.body.groupId,
             birthday: req.body.birthday,
+            studentTicket: req.body.studentTicket,
+            academicBook: req.body.academicBook,
         });
 
         await student.save();
@@ -54,6 +45,8 @@ module.exports.updateStudent = async (req, res) => {
                 name: req.body.name,
                 groupId: req.body.groupId,
                 birthday: req.body.birthday,
+                studentTicket: req.body.studentTicket,
+                academicBook: req.body.academicBook,
             });
         const student = await StudentDB.findById(req.params.id);
 
@@ -65,6 +58,11 @@ module.exports.updateStudent = async (req, res) => {
 
 module.exports.removeStudent = async (req, res) => {
     try {
+        const academicPerformances = await AcademicPerformanceDB.find({ studentId: req.params.id });
+        for(let i = 0; i < academicPerformances.length; i++) {
+            await AcademicPerformanceDB.findByIdAndRemove(academicPerformances[i]);
+        }
+
         await StudentDB.findByIdAndRemove(req.params.id);
 
         res.status(200).json();

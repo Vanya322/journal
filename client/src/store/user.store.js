@@ -42,6 +42,7 @@ export default {
       if(!store.state.coreModule.drawer) {
         store.commit("coreModule/toggleDrawer")
       }
+      store.dispatch("groupsModule/loadPage")
     },
 
     clearUser(state) {
@@ -57,9 +58,17 @@ export default {
       }, 1000 * 60 * 60)
     },
 
-    async refreshAccessToken({ state, commit }) {
+    async refreshAccessToken({ commit }) {
       try {
-        const { data } = await axios.post(`${API_SERVER}/auth/login`, state.user);
+        const authToken = getLocalStorageData(storageAuthKey);
+
+        const { data } = await axios({
+          method: "post",
+          baseURL: `${API_SERVER}/auth/login`,
+          headers: {
+            Authorization: authToken,
+          },
+        });
         commit("updateAccessToken", data.token)
       }
       catch(e) {

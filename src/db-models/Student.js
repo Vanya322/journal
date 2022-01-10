@@ -14,6 +14,14 @@ const studentSchema = new Schema({
         type: Schema.Types.ObjectId,
         required: true
     },
+    studentTicket: {
+        type: String,
+        required: true
+    },
+    academicBook: {
+        type: String,
+        required: true
+    },
     birthday: {
         type: String,
         required: true
