@@ -6,11 +6,16 @@ export class User {
         this.id = id;
         this.name = name;
         this.email = email;
-        this.type = USER_TYPES[type];
+        this.type = type;
     }
 
     static fromDto(data) {
-        return new User(data.id, data.name, data.email, data.type);
+        return new User(
+            data.id,
+            data.name,
+            data.email,
+            USER_TYPES[data.type],
+        );
     }
 
     get isMember() {
@@ -50,5 +55,18 @@ export class User {
         } else {
             next();
         }
+    }
+}
+
+export class UserDto {
+    constructor(id, name, email, type) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.type = type;
+    }
+
+    static toDto(data) {
+        return new UserDto(data.id, data.name, data.email, data.type.value);
     }
 }

@@ -25,8 +25,9 @@ const router = new VueRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
-    if (!store.state.userModule.user) {
-       await store.dispatch("userModule/checkTokenAndSignIn");
+    if (!store.state.userModule.user && store.state.userModule.tryToSignInCount === 0) {
+        await store.dispatch("userModule/checkTokenAndSignIn");
+        store.state.userModule.tryToSignInCount++;
     }
     if (store.state.userModule.user) {
         store.state.userModule.user.applyRedirectRules(to, from, next);

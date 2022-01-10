@@ -6,7 +6,7 @@
           Группы
         </v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-btn color="primary">
+        <v-btn color="primary" @click="openEditDialog({})">
           Добавить группу
         </v-btn>
       </v-toolbar>
@@ -26,6 +26,7 @@
         </div>
       </v-card-text>
     </v-card>
+    <EditGroupDialog ref="editGroupDialog" @onUpdate="loadPage"/>
   </v-container>
 </template>
 
@@ -35,6 +36,10 @@ import {mapState} from "vuex";
 export default {
   name: "Groups",
 
+  components: {
+    EditGroupDialog: () => import("./EditGroupDialog"),
+  },
+
   computed: {
     ...mapState("coreModule", ["drawer"]),
     ...mapState("groupsModule", [
@@ -43,8 +48,18 @@ export default {
     ])
   },
 
+  methods: {
+    loadPage(){
+      this.$store.dispatch("groupsModule/loadPage")
+    },
+
+    openEditDialog(group) {
+      this.$refs.editGroupDialog.openDialog(group)
+    }
+  },
+
   mounted() {
-    this.$store.dispatch("groupsModule/loadPage")
+    this.loadPage();
   }
 }
 </script>

@@ -87,7 +87,7 @@
       <v-data-table
         :headers="headers"
         :items="items"
-        :loading="false"
+        :loading="loading"
         disable-pagination
         hide-default-footer
         disable-sort
@@ -128,6 +128,7 @@
       @onUpdate="loadTargetGroup"
     />
     <AddStudentDialog ref="addStudentDialog" @onUpdate="loadTargetGroup" />
+    <ConfirmationDialog ref="confirmationDialog" />
   </v-container>
 </template>
 
@@ -143,7 +144,8 @@ export default {
   components: {
     EditField: () => import("./EditField"),
     AddScienceDialog: () => import("./AddScienceDialog"),
-    AddStudentDialog: () => import("../students/EditStudentDialog")
+    AddStudentDialog: () => import("../students/EditStudentDialog"),
+    ConfirmationDialog: () => import("../ConfirmationDialog"),
   },
 
   data: () => ({

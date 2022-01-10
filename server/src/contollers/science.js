@@ -60,9 +60,12 @@ module.exports.removeScience = async (req, res) => {
         const sciencePerformances = await SciencePerformanceDB.find({ scienceId: req.params.id });
         for(let i = 0; i < sciencePerformances.length; i++) {
             const sciencePerformance = sciencePerformances[i]
+            const academicPerformances = await AcademicPerformanceDB.find({
+                sciencePerformanceId: sciencePerformance._id
+            })
 
-            for(let j = 0; j < sciencePerformance.academicPerformances.length; j++) {
-                const itemId = sciencePerformance.academicPerformances[j];
+            for(let i = 0; i < academicPerformances.length; i++) {
+                const itemId = academicPerformances[i];
                 await AcademicPerformanceDB.findByIdAndRemove(itemId);
             }
             await SciencePerformanceDB.findByIdAndRemove(sciencePerformance._id);

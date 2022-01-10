@@ -33,15 +33,12 @@ module.exports.createSciencePerformance = async (req, res) => {
 
 module.exports.removeSciencePerformance = async (req, res) => {
     try {
-        const sciencePerformance = await SciencePerformanceDB.findById(req.params.id);
-        const targetGroup = await GroupDB.findById(sciencePerformance.groupId);
-
-        await GroupDB.findByIdAndUpdate(sciencePerformance.groupId, {
-            sciencePerformances: targetGroup.sciencePerformances.filter((itemId) => itemId !== req.params.id)
+        const academicPerformances = await AcademicPerformanceDB.find({
+            sciencePerformanceId: req.params.id
         })
 
-        for(let i = 0; i < sciencePerformance.academicPerformances.length; i++) {
-            const itemId = sciencePerformance.academicPerformances[i];
+        for(let i = 0; i < academicPerformances.length; i++) {
+            const itemId = academicPerformances[i];
             await AcademicPerformanceDB.findByIdAndRemove(itemId);
         }
 

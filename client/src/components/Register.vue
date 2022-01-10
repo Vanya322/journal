@@ -26,18 +26,16 @@
             ></v-text-field>
           </v-card-text>
           <v-card-actions>
-            <router-link to="/login">
-              <v-btn
-                :disabled="authInProgress"
-              >
+            <router-link to="/login" class="no-link-style">
+              <v-btn :disabled="authInProgress">
                 Вход
               </v-btn>
             </router-link>
             <v-spacer></v-spacer>
             <v-btn
-                color="primary"
-                @click="onRegisterClick"
-                :disabled="disableBtn"
+              color="primary"
+              @click="onRegisterClick"
+              :disabled="disableBtn"
             >
               Регистрация
             </v-btn>

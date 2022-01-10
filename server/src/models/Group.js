@@ -1,7 +1,7 @@
 const SciencePerformancesDB= require('../db-models/SciencePerformance');
 const StudentsDB= require('../db-models/Student');
 const SciencePerformanceDto = require("./SciencePerformance")
-const Student = require("../models/Student");
+const Student = require("./Student");
 
 module.exports = class GroupDto {
     constructor(

@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="open" width="500px">
-    <v-card class="edit-science-dialog">
+    <v-card class="edit-science-dialog" :loading="loading">
       <v-card-title>
         {{
           science.id
@@ -12,12 +12,13 @@
         <v-text-field
           label="Название"
           v-model="science.name"
+          :disabled="loading"
         ></v-text-field>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn text @click="open = false">Отменить</v-btn>
-        <v-btn text color="primary" :disabled="disableSave" @click="save()">
+        <v-btn text :disabled="loading" @click="open = false">Отменить</v-btn>
+        <v-btn text color="primary" :disabled="disableSave || loading" @click="save()">
           {{
             science.id
               ? "Изменить"
@@ -38,6 +39,7 @@ export default {
     dateMenu: false,
 
     science: {},
+    loading: false,
   }),
 
   computed: {
@@ -53,7 +55,9 @@ export default {
     },
 
     async save() {
+      this.loading = true;
       await this.$store.dispatch("sciencesModule/addOrSaveScience", this.science)
+      this.loading = false;
       this.open = false;
     }
   }

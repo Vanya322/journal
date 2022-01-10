@@ -41,6 +41,7 @@ import { mapState } from "vuex";
 import GroupsPage from "../views/GroupsPage";
 import StudentsPage from "../views/StudentsPage";
 import SciencesPage from "../views/SciencesPage";
+import UsersPage from "../views/UsersPage";
 
 export default {
   name: "NavigationDrawer",
@@ -69,6 +70,7 @@ export default {
         GroupsPage,
         StudentsPage,
         SciencesPage,
+        UsersPage,
       ].map((it) => it.routing)
         .filter((it) => it.hasAccess(this.user));
     },

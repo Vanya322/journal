@@ -19,6 +19,7 @@ export default {
     user: undefined,
     accessToken: undefined,
     refreshToken: undefined,
+    tryToSignInCount: 0,
   },
   mutations: {
     startAuth(state) {
@@ -81,7 +82,7 @@ export default {
       try {
         const { data } = await axios.post(`${API_SERVER}/auth/login`, user);
         commit("updateUser", data)
-        await router.push("/");
+        await router.push("/groups");
         dispatch("installRefreshToken")
       }
       catch(e) {
@@ -114,7 +115,7 @@ export default {
       try {
         const data = await axios.post(`${API_SERVER}/auth/register`, user);
         commit("updateUser", data)
-        await router.push("/");
+        await router.push("/groups");
         dispatch("installRefreshToken")
       }
       catch(e) {

@@ -1,14 +1,15 @@
-import {Group} from "../models/Group";
 import axios from "axios";
 import {API_SERVER, bodyWithAuthHeader, handleHttpError} from "../utils/utils";
+import {User} from "../models/User";
 
 export default {
-    name: "groupsModule",
+    name: "usersModule",
     namespaced: true,
     state: {
-        groups: [],
+        users: [],
         currentLoading: false,
     },
+
     mutations: {
         startLoading(state) {
             state.currentLoading = true;
@@ -16,20 +17,21 @@ export default {
         endLoading(state) {
             state.currentLoading = false;
         },
-        updateGroups(state, groups) {
-            state.groups = groups.map(it => Group.fromDto(it));
+        updateUsers(state, users) {
+            state.users = users.map(it => User.fromDto(it));
         },
     },
+
     actions: {
         async loadPage({ commit }) {
             commit("startLoading");
             try {
                 const { data } = await axios({
                     method: "get",
-                    baseURL: `${API_SERVER}/groups`,
+                    baseURL: `${API_SERVER}/users`,
                     ...bodyWithAuthHeader(),
                 });
-                commit("updateGroups", data);
+                commit("updateUsers", data);
             }
             catch(e) {
                 handleHttpError(e);
@@ -37,32 +39,33 @@ export default {
             commit("endLoading");
         },
 
-        async loadGroupById(context, groupId) {
+        async addOrSaveUser({ dispatch }, { user, oldPassword }) {
             try {
-                const { data } = await axios({
-                    method: "get",
-                    baseURL: `${API_SERVER}/groups/${groupId}`,
+                await axios({
+                    method: user.id ? "put" : "post",
+                    baseURL: user.id
+                        ? `${API_SERVER}/users/${user.id}`
+                        : `${API_SERVER}/users`,
                     ...bodyWithAuthHeader(),
+
+                    data: {
+                        ...user,
+                        type: user.type.value,
+                        oldPassword,
+                    }
                 });
-                return data ? Group.fromDto(data) : undefined;
             }
             catch(e) {
                 handleHttpError(e);
             }
         },
 
-        async addOrSaveGroup({ dispatch }, group) {
+        async deleteUser({ dispatch }, user) {
             try {
                 await axios({
-                    method: group.id ? "put" : "post",
-                    baseURL: group.id
-                        ? `${API_SERVER}/groups/${group.id}`
-                        : `${API_SERVER}/groups`,
+                    method: "delete",
+                    baseURL: `${API_SERVER}/users/${user.id}`,
                     ...bodyWithAuthHeader(),
-
-                    data: {
-                        ...group,
-                    }
                 });
                 dispatch("loadPage")
             }

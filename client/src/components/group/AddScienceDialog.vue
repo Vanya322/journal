@@ -12,6 +12,7 @@
             return-object
             item-text="name"
             item-value="id"
+            :item-disabled="disabledScience"
         >
           <template v-slot:selection="{item}">
             {{item.name}}
@@ -58,6 +59,10 @@ export default {
   },
 
   methods: {
+    disabledScience(science) {
+      return this.group.sciencePerformances.some(it => it.science.id === science.id);
+    },
+
     openDialog() {
       this.open = true;
     },

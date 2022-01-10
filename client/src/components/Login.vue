@@ -21,13 +21,11 @@
             ></v-text-field>
           </v-card-text>
           <v-card-actions>
-            <router-link to="/register">
-              <v-btn
-                :disabled="authInProgress"
-              >
-                Регистрация
-              </v-btn>
-            </router-link>
+<!--            <router-link to="/register" class="no-link-style">-->
+<!--              <v-btn :disabled="authInProgress">-->
+<!--                Регистрация-->
+<!--              </v-btn>-->
+<!--            </router-link>-->
             <v-spacer></v-spacer>
             <v-btn
               color="primary"

@@ -1,34 +1,22 @@
 <template>
   <v-dialog v-model="open" width="500px">
-    <v-card class="edit-student-dialog" :loading="loading">
+    <v-card class="edit-group-dialog" :loading="loading">
       <v-card-title>
         {{
-          student.id
+          group.id
             ? "Редактирование"
             : "Создание"
         }}
       </v-card-title>
       <v-card-text>
         <v-text-field
-          label="Имя"
+          label="Название"
           :disabled="loading"
-          v-model="student.name"
-        ></v-text-field>
-        <v-text-field
-          label="Студенческий билет"
-          :disabled="loading"
-          type="number"
-          v-model="student.studentTicket"
-        ></v-text-field>
-        <v-text-field
-          label="Зачётная книжка"
-          :disabled="loading"
-          type="number"
-          v-model="student.academicBook"
+          v-model="group.name"
+          :rules="[groupNameRule]"
         ></v-text-field>
         <v-menu
-          ref="dateMenu"
-          v-model="dateMenu"
+          v-model="dateStartMenu"
           :close-on-content-click="false"
           transition="scale-transition"
           offset-y
@@ -36,8 +24,8 @@
         >
           <template v-slot:activator="{ on, attrs }">
             <v-text-field
-              v-model="student.birthday"
-              label="Дата рождения"
+              v-model="group.dateStart"
+              label="Начало обучения"
               :disabled="loading"
               readonly
               v-bind="attrs"
@@ -45,26 +33,32 @@
             ></v-text-field>
           </template>
           <v-date-picker
-            v-model="student.birthday"
+            v-model="group.dateStart"
             no-title
           ></v-date-picker>
         </v-menu>
-        <v-autocomplete
-          v-model="student.group"
-          label="Группа"
-          :items="groups"
-          return-object
-          item-text="name"
-          item-value="id"
-          :disabled="disableGroup || loading"
+        <v-menu
+            v-model="dateEndMenu"
+            :close-on-content-click="false"
+            transition="scale-transition"
+            offset-y
+            min-width="auto"
         >
-          <template v-slot:selection="{item}">
-            {{item.name}}
+          <template v-slot:activator="{ on, attrs }">
+            <v-text-field
+                v-model="group.dateEnd"
+                label="Конец обучения"
+                :disabled="loading"
+                readonly
+                v-bind="attrs"
+                v-on="on"
+            ></v-text-field>
           </template>
-          <template v-slot:item="{item}">
-            {{item.name}}
-          </template>
-        </v-autocomplete>
+          <v-date-picker
+              v-model="group.dateEnd"
+              no-title
+          ></v-date-picker>
+        </v-menu>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
@@ -80,7 +74,7 @@
           @click="save()"
         >
           {{
-            student.id
+            group.id
               ? "Изменить"
               : "Создать"
           }}
@@ -92,43 +86,46 @@
 
 <script>
 import {mapState} from "vuex";
-import {Student} from "../../models/Student";
+import {Group} from "../../models/Group";
 
 export default {
-  name: "EditStudentDialog",
+  name: "EditGroupDialog",
 
   data: () => ({
     open: false,
-    dateMenu: false,
 
-    student: {},
-    disableGroup: false,
+    group: {},
+    dateStartMenu: false,
+    dateEndMenu: false,
     loading: false,
   }),
 
   computed: {
     ...mapState("groupsModule", ["groups"]),
 
+    groupNameRule() {
+      return !this.groups.some((it) => it.name === this.group.name)
+        || "Такое имя уже существует!"
+    },
+
     disableSave() {
-      return !this.student.name
-        || !this.student.birthday
-        || !this.student.studentTicket
-        || !this.student.academicBook
-        || !this.student.group
+      return !this.group.name
+        || !this.group.dateStart
+        || !this.group.dateEnd
+        || this.groups.some((it) => it.name === this.group.name)
     }
   },
 
   methods: {
-    openDialog(student, disableGroup) {
-      this.disableGroup = disableGroup;
-      this.student = new Student();
-      this.student = Object.assign(this.student, student);
+    openDialog(group) {
+      this.group = new Group();
+      this.group = Object.assign(this.group, group);
       this.open = true;
     },
 
     async save() {
       this.loading = true;
-      await this.$store.dispatch("studentsModule/addOrSaveStudent", this.student)
+      await this.$store.dispatch("groupsModule/addOrSaveGroup", this.group)
       await this.$emit("onUpdate")
       this.loading = true;
       this.open = false;
