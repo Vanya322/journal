@@ -53,6 +53,9 @@ export default {
 
   watch: {
     academicPerformance() {
+      if(this.mode === LOADING_MODE && !this.academicPerformance.performance) {
+        return;
+      }
       if(this.academicPerformance.id && this.academicPerformance.performance) {
         this.mode = VIEW_MODE;
       } else {

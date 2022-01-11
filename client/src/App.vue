@@ -66,6 +66,12 @@ export default {
 
 <style lang="scss">
 @import "~vuetify/src/components/VStepper/_variables.scss";
+.search-field {
+  max-width: 250px;
+  .v-text-field__details {
+    display: none !important;
+  }
+}
 .no-link-style {
   text-decoration: none !important;
   color: black !important;

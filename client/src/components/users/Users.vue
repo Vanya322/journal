@@ -6,13 +6,18 @@
           Пользователи
         </v-toolbar-title>
         <v-spacer></v-spacer>
+        <v-text-field
+          class="search-field mr-2"
+          label="Поиск"
+          v-model="searchString"
+        ></v-text-field>
         <v-btn color="primary" @click="createUser">
           Добавить пользователя
         </v-btn>
       </v-toolbar>
       <v-data-table
           :headers="headers"
-          :items="users"
+          :items="displayUsers"
           :loading="currentLoading"
           disable-pagination
           hide-default-footer
@@ -43,29 +48,50 @@ export default {
   },
 
   data: () => ({
+    searchString: "",
+
     headers: [
       {
         text: "ФИО",
-        value: "name"
+        value: "name",
+        sort: (a, b) => {
+          return a.localeCompare(b);
+        },
       },
       {
         text: "Почта",
-        value: "email"
+        value: "email",
+        sort: (a, b) => {
+          return a.localeCompare(b);
+        },
       },
       {
         text: "Тип",
-        value: "type"
+        value: "type",
+        sort: (a, b) => {
+          return a.text.localeCompare(b.text);
+        },
       },
       {
         text: "",
-        value: "actions"
+        value: "actions",
+        sortable: false,
       },
     ],
   }),
 
   computed: {
     ...mapState("coreModule", ["drawer"]),
-    ...mapState("usersModule", ["users", "currentLoading"])
+    ...mapState("usersModule", ["users", "currentLoading"]),
+
+    displayUsers() {
+      const str = this.searchString.trim().toLowerCase();
+      return str ? this.users.filter((user) => (
+          (user.name.toLowerCase().includes(str))
+          || (user.email.toLowerCase().includes(str))
+          || (user.type.text.toLowerCase().includes(str))
+      )) : this.users
+    }
   },
 
   methods: {

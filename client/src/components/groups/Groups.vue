@@ -6,13 +6,19 @@
           Группы
         </v-toolbar-title>
         <v-spacer></v-spacer>
+        <v-text-field
+          class="search-field mr-2"
+          label="Поиск"
+          v-model="searchString"
+          clerable
+        ></v-text-field>
         <v-btn color="primary" @click="openEditDialog({})">
           Добавить группу
         </v-btn>
       </v-toolbar>
       <v-card-text>
         <div class="d-flex">
-          <v-card v-for="group in groups" :key="group.id" class="ma-1 cursor">
+          <v-card v-for="group in displayGroups" :key="group.id" class="ma-1 cursor">
             <router-link :to="`/groups/${group.id}`" class="no-link-style">
               <v-card-title>
                 {{group.name}}
@@ -32,6 +38,7 @@
 
 <script>
 import {mapState} from "vuex";
+import moment from "moment";
 
 export default {
   name: "Groups",
@@ -40,12 +47,26 @@ export default {
     EditGroupDialog: () => import("./EditGroupDialog"),
   },
 
+  data: () => ({
+    searchString: "",
+  }),
+
   computed: {
     ...mapState("coreModule", ["drawer"]),
     ...mapState("groupsModule", [
       "groups",
       "currentLoading",
-    ])
+    ]),
+
+    displayGroups() {
+      const str = this.searchString.trim().toLowerCase();
+      return str ? this.groups.filter((group) => (
+          group.name.toLowerCase().includes(str)
+          || group.dateStart.toLowerCase().includes(str)
+          || group.dateEnd.toLowerCase().includes(str)
+        ))
+        : this.groups
+    }
   },
 
   methods: {

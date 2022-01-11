@@ -6,13 +6,18 @@
           Студенты
         </v-toolbar-title>
         <v-spacer></v-spacer>
+        <v-text-field
+            class="search-field mr-2"
+            label="Поиск"
+            v-model="searchString"
+        ></v-text-field>
         <v-btn color="primary" @click="createStudent">
           Добавить студента
         </v-btn>
       </v-toolbar>
       <v-data-table
           :headers="headers"
-          :items="students"
+          :items="displayStudents"
           :loading="currentLoading"
           disable-pagination
           hide-default-footer
@@ -40,37 +45,66 @@ export default {
   },
 
   data: () => ({
+    searchString: "",
+
     headers: [
       {
         text: "ФИО",
-        value: "name"
+        value: "name",
+        sort: (a, b) => {
+          return a.localeCompare(b);
+        },
       },
       {
         text: "Группа",
-        value: "group.name"
+        value: "group.name",
+        sort: (a, b) => {
+          return a.localeCompare(b);
+        },
       },
       {
         text: "Студенческий билет",
-        value: "studentTicket"
+        value: "studentTicket",
+        sort: (a, b) => {
+          return a.localeCompare(b);
+        },
       },
       {
         text: "Зачётная книжка",
-        value: "academicBook"
+        value: "academicBook",
+        sort: (a, b) => {
+          return a.localeCompare(b);
+        },
       },
       {
         text: "Дата рождения",
-        value: "birthday"
+        value: "birthday",
+        sort: (a, b) => {
+          return a.localeCompare(b);
+        },
       },
       {
         text: "",
-        value: "actions"
+        value: "actions",
+        sortable: false,
       },
     ],
   }),
 
   computed: {
     ...mapState("coreModule", ["drawer"]),
-    ...mapState("studentsModule", ["students", "currentLoading"])
+    ...mapState("studentsModule", ["students", "currentLoading"]),
+
+    displayStudents() {
+      const str = this.searchString.trim().toLowerCase();
+      return str ? this.students.filter((student) => (
+          (student.name.toLowerCase().includes(str))
+          || (student.group.name.toLowerCase().includes(str))
+          || (student.studentTicket.toLowerCase().includes(str))
+          || (student.academicBook.toLowerCase().includes(str))
+          || (student.birthday.toLowerCase().includes(str))
+      )) : this.students
+    }
   },
 
   methods: {

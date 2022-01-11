@@ -6,13 +6,18 @@
           Предметы
         </v-toolbar-title>
         <v-spacer></v-spacer>
+        <v-text-field
+          class="search-field mr-2"
+          label="Поиск"
+          v-model="searchString"
+        ></v-text-field>
         <v-btn color="primary" @click="createScience">
           Добавить предмет
         </v-btn>
       </v-toolbar>
       <v-data-table
           :headers="headers"
-          :items="sciences"
+          :items="displaySciences"
           :loading="currentLoading"
           disable-pagination
           hide-default-footer
@@ -40,21 +45,34 @@ export default {
   },
 
   data: () => ({
+    searchString: "",
+
     headers: [
       {
         text: "Название",
-        value: "name"
+        value: "name",
+        sort: (a, b) => {
+          return a.localeCompare(b);
+        },
       },
       {
         text: "",
-        value: "actions"
+        value: "actions",
+        sortable: false,
       },
     ],
   }),
 
   computed: {
     ...mapState("coreModule", ["drawer"]),
-    ...mapState("sciencesModule", ["sciences", "currentLoading"])
+    ...mapState("sciencesModule", ["sciences", "currentLoading"]),
+
+    displaySciences() {
+      const str = this.searchString.trim().toLowerCase();
+      return str ? this.sciences.filter((science) => (
+          science.name.toLowerCase().includes(str)
+      )) : this.sciences
+    }
   },
 
   methods: {

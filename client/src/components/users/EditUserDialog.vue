@@ -31,19 +31,21 @@
           label="Пароль"
           :disabled="loading"
           type="password"
+          :rules="[passwordRule]"
           v-model="user.password"
         ></v-text-field>
         <v-text-field
           label="Повторить пароль"
           :disabled="loading"
           type="password"
-          :rules="[passwordRule]"
+          :rules="[passwordCopyRule]"
           v-model="passwordCopy"
         ></v-text-field>
         <v-select
-          label="Тип пользователя"
+          label="Тип"
           :items="userTypes"
           v-model="user.type"
+          :disabled="loading"
           item-text="text"
           item-value="value"
           return-object
@@ -97,6 +99,11 @@ export default {
     },
 
     passwordRule() {
+      return !!this.oldPassword && !!this.user.password
+        || "Введите старый пароль!";
+    },
+
+    passwordCopyRule() {
       return this.user.password === this.passwordCopy
         || "Пароли не совпадают!";
     },
@@ -109,7 +116,9 @@ export default {
     disableSave() {
       if(this.user.id) {
         return !this.user.name
-            || !this.user.email
+          || !this.user.email
+          || (!!this.oldPassword && !this.user.password)
+          || (!this.oldPassword && !!this.user.password)
       }
       return !this.user.name
         || !this.user.email

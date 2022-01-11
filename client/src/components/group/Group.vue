@@ -79,7 +79,11 @@
                 :key="item.id"
             >
               {{ item.science.name }}
-              <v-icon small @click="deleteScienceFromGroup(item)">mdi-close</v-icon>
+              <v-icon
+                v-if="user.isAdmin"
+                small
+                @click="deleteScienceFromGroup(item)"
+              >mdi-close</v-icon>
             </v-tab>
           </v-tabs>
         </template>
