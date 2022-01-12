@@ -104,15 +104,17 @@ export default {
     ...mapState("groupsModule", ["groups"]),
 
     groupNameRule() {
-      return !this.groups.some((it) => it.name === this.group.name)
-        || "Такое имя уже существует!"
+      return !this.group.id
+        ? !this.groups.some((it) => it.name === this.group.name)
+            || "Такое имя уже существует!"
+        : true;
     },
 
     disableSave() {
       return !this.group.name
         || !this.group.dateStart
         || !this.group.dateEnd
-        || this.groups.some((it) => it.name === this.group.name)
+        || !this.groupNameRule
     }
   },
 
@@ -127,7 +129,7 @@ export default {
       this.loading = true;
       await this.$store.dispatch("groupsModule/addOrSaveGroup", this.group)
       await this.$emit("onUpdate")
-      this.loading = true;
+      this.loading = false;
       this.open = false;
     }
   }

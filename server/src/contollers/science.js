@@ -3,16 +3,35 @@ const errorHandler = require('../utils/error-handler')
 const ScienceDto = require("../models/Science");
 const SciencePerformanceDB = require("../db-models/SciencePerformance");
 const AcademicPerformanceDB = require("../db-models/AcademicPerformance");
+const User = require("../models/User");
 
 module.exports.getAllSciences = async (req, res) => {
+    const user = User.toModel(req.user)
+
+    if (!user.isAdmin) {
+        errorHandler(res, "Отказано в доступе!");
+        return;
+    }
+
     try {
         const sciences = await ScienceDB.find();
-        res.status(200).json(sciences.map((it) => ScienceDto.toDto(it)));
+        res.status(200).json(
+            sciences.map((it) => ScienceDto.toDto(it))
+                .sort((a, b) => a.name.localeCompare(b.name))
+        );
     } catch (e) {
+        console.log("___", e)
         errorHandler(res, e);
     }
 }
 module.exports.createScience = async (req, res) => {
+    const user = User.toModel(req.user)
+
+    if (!user.isAdmin) {
+        errorHandler(res, "Отказано в доступе!");
+        return;
+    }
+
     try {
         if (!req.body.name) {
             res.status(404).json({
@@ -40,6 +59,13 @@ module.exports.createScience = async (req, res) => {
 }
 
 module.exports.updateScience = async (req, res) => {
+    const user = User.toModel(req.user)
+
+    if (!user.isAdmin) {
+        errorHandler(res, "Отказано в доступе!");
+        return;
+    }
+
     try {
         await ScienceDB.findByIdAndUpdate({
             _id: req.params.id
@@ -56,6 +82,13 @@ module.exports.updateScience = async (req, res) => {
 }
 
 module.exports.removeScience = async (req, res) => {
+    const user = User.toModel(req.user)
+
+    if (!user.isAdmin) {
+        errorHandler(res, "Отказано в доступе!");
+        return;
+    }
+
     try {
         const sciencePerformances = await SciencePerformanceDB.find({ scienceId: req.params.id });
         for(let i = 0; i < sciencePerformances.length; i++) {

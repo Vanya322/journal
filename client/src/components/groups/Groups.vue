@@ -18,20 +18,42 @@
       </v-toolbar>
       <v-card-text>
         <div class="d-flex">
-          <v-card v-for="group in displayGroups" :key="group.id" class="ma-1 cursor">
-            <router-link :to="`/groups/${group.id}`" class="no-link-style">
-              <v-card-title>
-                {{group.name}}
-              </v-card-title>
-              <v-card-subtitle>
-                <p class="ma-0">Начало обучения: {{group.dateStart}}</p>
-                <p class="ma-0">Конец обучения: {{group.dateEnd}}</p>
-              </v-card-subtitle>
-            </router-link>
+          <v-card
+            v-for="group in displayGroups"
+            :key="group.id"
+            class="ma-1 cursor"
+            @click="$router.push(`/groups/${group.id}`)"
+          >
+            <v-card-title>
+              {{group.name}}
+              <v-spacer></v-spacer>
+              <v-btn
+                v-if="user.isAdmin"
+                icon
+                small
+                @click.stop="openEditDialog(group)"
+              >
+                <v-icon>mdi-pencil</v-icon>
+              </v-btn>
+              <v-btn
+                v-if="user.isAdmin"
+                icon
+                small
+                color="red"
+                @click.stop="openDeleteDialog(group)"
+              >
+                <v-icon>mdi-delete</v-icon>
+              </v-btn>
+            </v-card-title>
+            <v-card-subtitle>
+              <p class="ma-0">Начало обучения: {{group.dateStart}}</p>
+              <p class="ma-0">Конец обучения: {{group.dateEnd}}</p>
+            </v-card-subtitle>
           </v-card>
         </div>
       </v-card-text>
     </v-card>
+    <ConfirmationDialog ref="confirmationDialog" />
     <EditGroupDialog ref="editGroupDialog" @onUpdate="loadPage"/>
   </v-container>
 </template>
@@ -44,6 +66,7 @@ export default {
   name: "Groups",
 
   components: {
+    ConfirmationDialog: () => import("../ConfirmationDialog"),
     EditGroupDialog: () => import("./EditGroupDialog"),
   },
 
@@ -52,6 +75,7 @@ export default {
   }),
 
   computed: {
+    ...mapState("userModule", ["user"]),
     ...mapState("coreModule", ["drawer"]),
     ...mapState("groupsModule", [
       "groups",
@@ -76,6 +100,19 @@ export default {
 
     openEditDialog(group) {
       this.$refs.editGroupDialog.openDialog(group)
+    },
+
+    openDeleteDialog(group) {
+      this.$refs.confirmationDialog.openDialog({
+        header: "Удаление",
+        text: `Вы уверены, что хотите удалить ${group.name}?`,
+        cancelText: "Отменить",
+        submitText: `Удалить`,
+        submitColor: "red",
+        onSubmit: async () => {
+          await this.$store.dispatch("groupsModule/deleteGroup", group)
+        },
+      });
     }
   },
 

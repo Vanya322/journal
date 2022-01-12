@@ -3,6 +3,7 @@ const errorHandler = require('../utils/error-handler')
 const GroupDto = require("../models/Group");
 const SciencePerformanceDB = require("../db-models/SciencePerformance");
 const AcademicPerformanceDB = require("../db-models/AcademicPerformance");
+const User = require("../models/User");
 
 module.exports.getAllGroups = async (req, res) => {
     try {
@@ -13,7 +14,7 @@ module.exports.getAllGroups = async (req, res) => {
             groupsDto.push(groupDto)
         }
 
-        res.status(200).json(groupsDto)
+        res.status(200).json(groupsDto.sort((a, b) => a.name.localeCompare(b.name)))
     } catch (e) {
         errorHandler(res, e);
     }
@@ -30,6 +31,13 @@ module.exports.getGroupById = async (req, res) => {
 }
 
 module.exports.createGroup = async (req, res) => {
+    const user = User.toModel(req.user)
+
+    if (!user.isAdmin) {
+        errorHandler(res, "Отказано в доступе!");
+        return;
+    }
+
     try {
         if (!req.body.name) {
             res.status(404).json({
@@ -63,6 +71,13 @@ module.exports.createGroup = async (req, res) => {
 }
 
 module.exports.updateGroup = async (req, res) => {
+    const user = User.toModel(req.user)
+
+    if (!user.isAdmin) {
+        errorHandler(res, "Отказано в доступе!");
+        return;
+    }
+
     try {
         await GroupDB.findByIdAndUpdate({
             _id: req.params.id
@@ -73,7 +88,7 @@ module.exports.updateGroup = async (req, res) => {
             dateEnd: req.body.dateEnd,
         });
         const group = await GroupDB.findById(req.params.id);
-        console.log(group)
+
         const groupDto = await GroupDto.toDto(group);
 
         res.status(200).json(groupDto);
@@ -83,6 +98,13 @@ module.exports.updateGroup = async (req, res) => {
 }
 
 module.exports.removeGroup = async (req, res) => {
+    const user = User.toModel(req.user)
+
+    if (!user.isAdmin) {
+        errorHandler(res, "Отказано в доступе!");
+        return;
+    }
+
     try {
         const sciencePerformances = await SciencePerformanceDB.find({ groupId: req.params.id });
         for(let i = 0; i < sciencePerformances.length; i++) {

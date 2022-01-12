@@ -155,8 +155,8 @@ export default {
   data: () => ({
     targetGroup: undefined,
     selectedDatesRange: [
-      moment().day(0).format(defaultDateFormat),
-      moment().day(6).format(defaultDateFormat),
+      moment().subtract(10, 'days').format(defaultDateFormat),
+      moment().format(defaultDateFormat),
     ],
     dateRangeMenu: false,
     selectedTab: 0,
@@ -190,6 +190,7 @@ export default {
         headers.push({
           text: m.format(defaultDateFormat),
           value: m.format(defaultDateFormat),
+          align: "center",
         });
       }
 

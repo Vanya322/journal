@@ -13,6 +13,7 @@
           label="Название"
           v-model="science.name"
           :disabled="loading"
+          :rules="[scienceNameRule]"
         ></v-text-field>
       </v-card-text>
       <v-card-actions>
@@ -31,6 +32,8 @@
 </template>
 
 <script>
+import {mapState} from "vuex";
+
 export default {
   name: "EditScienceDialog",
 
@@ -43,8 +46,15 @@ export default {
   }),
 
   computed: {
+    ...mapState("sciencesModule", ["sciences"]),
+
+    scienceNameRule() {
+      return !this.sciences.some(it => it.name === this.science.name)
+        || "Такой предмет уже существует!";
+    },
+
     disableSave() {
-      return !this.science.name
+      return !this.science.name || this.scienceNameRule !== true
     }
   },
 

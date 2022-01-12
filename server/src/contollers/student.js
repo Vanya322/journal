@@ -2,16 +2,34 @@ const StudentDB = require("../db-models/Student")
 const errorHandler = require('../utils/error-handler')
 const StudentDto = require("../models/Student");
 const AcademicPerformanceDB = require("../db-models/AcademicPerformance");
+const User = require("../models/User");
 
 module.exports.getAllStudents = async (req, res) => {
+    const user = User.toModel(req.user)
+
+    if (!user.isAdmin) {
+        errorHandler(res, "Отказано в доступе!");
+        return;
+    }
+
     try {
         const students = await StudentDB.find();
-        res.status(200).json(students.map((it) => StudentDto.toDto(it)));
+        res.status(200).json(
+            students.map((it) => StudentDto.toDto(it))
+                .sort((a, b) => a.name.localeCompare(b.name))
+        );
     } catch (e) {
         errorHandler(res, e);
     }
 }
 module.exports.createStudent = async (req, res) => {
+    const user = User.toModel(req.user)
+
+    if (!user.isAdmin) {
+        errorHandler(res, "Отказано в доступе!");
+        return;
+    }
+
     try {
         if (!req.body.name) {
             res.status(404).json({
@@ -37,6 +55,13 @@ module.exports.createStudent = async (req, res) => {
 }
 
 module.exports.updateStudent = async (req, res) => {
+    const user = User.toModel(req.user)
+
+    if (!user.isAdmin) {
+        errorHandler(res, "Отказано в доступе!");
+        return;
+    }
+
     try {
         await StudentDB.findByIdAndUpdate({
                 _id: req.params.id
@@ -57,6 +82,13 @@ module.exports.updateStudent = async (req, res) => {
 }
 
 module.exports.removeStudent = async (req, res) => {
+    const user = User.toModel(req.user)
+
+    if (!user.isAdmin) {
+        errorHandler(res, "Отказано в доступе!");
+        return;
+    }
+
     try {
         const academicPerformances = await AcademicPerformanceDB.find({ studentId: req.params.id });
         for(let i = 0; i < academicPerformances.length; i++) {

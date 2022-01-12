@@ -61,7 +61,10 @@ export default {
                     ...bodyWithAuthHeader(),
 
                     data: {
-                        ...group,
+                        id: group.id,
+                        name: group.name,
+                        dateStart: group.dateStart,
+                        dateEnd: group.dateEnd,
                     }
                 });
                 dispatch("loadPage")
@@ -70,5 +73,19 @@ export default {
                 handleHttpError(e);
             }
         },
+
+        async deleteGroup({ dispatch }, group) {
+            try {
+                await axios({
+                    method: "delete",
+                    baseURL: `${API_SERVER}/groups/${group.id}`,
+                    ...bodyWithAuthHeader(),
+                });
+                dispatch("loadPage")
+            }
+            catch(e) {
+                handleHttpError(e);
+            }
+        }
     }
 }

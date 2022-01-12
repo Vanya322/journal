@@ -130,7 +130,7 @@ export default {
       this.loading = true;
       await this.$store.dispatch("studentsModule/addOrSaveStudent", this.student)
       await this.$emit("onUpdate")
-      this.loading = true;
+      this.loading = false;
       this.open = false;
     }
   }

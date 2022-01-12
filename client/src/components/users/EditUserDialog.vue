@@ -3,7 +3,7 @@
     <v-card class="edit-student-dialog" :loading="loading">
       <v-card-title>
         {{
-          user.id
+          targetUser.id
             ? "Редактирование"
             : "Создание"
         }}
@@ -12,16 +12,16 @@
         <v-text-field
           label="ФИО"
           :disabled="loading"
-          v-model="user.name"
+          v-model="targetUser.name"
         ></v-text-field>
         <v-text-field
           label="Почта"
           :disabled="loading"
           :rules="[emailRule]"
-          v-model="user.email"
+          v-model="targetUser.email"
         ></v-text-field>
         <v-text-field
-            v-if="user.id"
+            v-if="targetUser.id"
             label="Старый пароль"
             :disabled="loading"
             type="password"
@@ -32,7 +32,7 @@
           :disabled="loading"
           type="password"
           :rules="[passwordRule]"
-          v-model="user.password"
+          v-model="targetUser.password"
         ></v-text-field>
         <v-text-field
           label="Повторить пароль"
@@ -44,7 +44,7 @@
         <v-select
           label="Тип"
           :items="userTypes"
-          v-model="user.type"
+          v-model="targetUser.type"
           :disabled="loading"
           item-text="text"
           item-value="value"
@@ -65,7 +65,7 @@
           @click="save()"
         >
           {{
-            user.id
+            targetUser.id
               ? "Изменить"
               : "Создать"
           }}
@@ -78,6 +78,7 @@
 <script>
 import {User} from "../../models/User";
 import {EMAIL_REGEX, USER_TYPE_MEMBER, USER_TYPES} from "../../utils/utils";
+import {mapState} from "vuex";
 
 export default {
   name: "EditUserDialog",
@@ -86,7 +87,7 @@ export default {
     open: false,
     dateMenu: false,
 
-    user: {},
+    targetUser: {},
     disableGroup: false,
     loading: false,
     passwordCopy: "",
@@ -94,51 +95,56 @@ export default {
   }),
 
   computed: {
+    ...mapState("userModule", ["user"]),
+
     userTypes() {
       return Object.values(USER_TYPES)
     },
 
     passwordRule() {
-      return !!this.oldPassword && !!this.user.password
+      return !!this.oldPassword && !!this.targetUser.password
         || "Введите старый пароль!";
     },
 
     passwordCopyRule() {
-      return this.user.password === this.passwordCopy
+      return this.targetUser.password === this.passwordCopy
         || "Пароли не совпадают!";
     },
 
     emailRule() {
-      return EMAIL_REGEX.test(this.user.email)
+      return EMAIL_REGEX.test(this.targetUser.email)
           || "Не валидная почта!";
     },
 
     disableSave() {
-      if(this.user.id) {
-        return !this.user.name
-          || !this.user.email
-          || (!!this.oldPassword && !this.user.password)
-          || (!this.oldPassword && !!this.user.password)
+      if(this.targetUser.id) {
+        return !this.targetUser.name
+          || !this.targetUser.email
+          || (!!this.oldPassword && !this.targetUser.password)
+          || (!this.oldPassword && !!this.targetUser.password)
       }
-      return !this.user.name
-        || !this.user.email
-        || !this.user.password
+      return !this.targetUser.name
+        || !this.targetUser.email
+        || !this.targetUser.password
     }
   },
 
   methods: {
-    openDialog(user) {
+    openDialog(targetUser) {
       this.passwordCopy = "";
       this.oldPassword = "";
-      this.user = new User(undefined, "", "", USER_TYPE_MEMBER);
-      this.user = Object.assign(this.user, user);
+      this.targetUser = new User(undefined, "", "", USER_TYPE_MEMBER);
+      this.targetUser = Object.assign(this.targetUser, targetUser);
       this.open = true;
     },
 
     async save() {
       this.loading = true;
-      await this.$store.dispatch("usersModule/addOrSaveUser", {user: this.user, oldPassword: this.oldPassword})
+      await this.$store.dispatch("usersModule/addOrSaveUser", {user: this.targetUser, oldPassword: this.oldPassword})
       await this.$emit("onUpdate")
+      if(this.targetUser.id === this.user.id) {
+        await this.$store.dispatch("userModule/checkTokenAndSignIn")
+      }
       this.loading = false;
       this.open = false;
     }

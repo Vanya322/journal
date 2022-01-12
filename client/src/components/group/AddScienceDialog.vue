@@ -64,6 +64,7 @@ export default {
     },
 
     openDialog() {
+      this.selectedScience = undefined;
       this.open = true;
     },
 

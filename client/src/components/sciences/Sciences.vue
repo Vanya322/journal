@@ -90,8 +90,8 @@ export default {
         cancelText: "Отменить",
         submitText: `Удалить`,
         submitColor: "red",
-        onSubmit: () => {
-          this.$store.dispatch("sciencesModule/deleteScience", science)
+        onSubmit: async () => {
+          await this.$store.dispatch("sciencesModule/deleteScience", science)
         },
       });
     },

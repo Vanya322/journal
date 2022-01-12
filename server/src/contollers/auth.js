@@ -4,7 +4,7 @@ const UserDB = require('../db-models/User');
 
 const tokenActions = require("../utils/token-actions")
 const errorHandler = require("../utils/error-handler")
-const UserDto = require("../models/User");
+const UserDto = require("../models/UserDto");
 const { parseAuthToken } = require("../utils/token-actions");
 
 module.exports.login = async (req, res) => {

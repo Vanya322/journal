@@ -37,7 +37,7 @@ module.exports = class GroupDto {
             data.name,
             data.dateStart,
             data.dateEnd,
-            studentsDto,
+            studentsDto.sort((a, b) => a.name.localeCompare(b.name)),
             sciencePerformancesDto,
         );
     }

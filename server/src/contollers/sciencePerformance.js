@@ -1,10 +1,17 @@
 const SciencePerformanceDB = require("../db-models/SciencePerformance")
-const GroupDB = require("../db-models/Group")
 const AcademicPerformanceDB = require("../db-models/AcademicPerformance")
 const errorHandler = require('../utils/error-handler')
 const SciencePerformanceDto = require("../models/SciencePerformance");
+const User = require("../models/User");
 
 module.exports.createSciencePerformance = async (req, res) => {
+    const user = User.toModel(req.user)
+
+    if (!user.isAdmin) {
+        errorHandler(res, "Отказано в доступе!");
+        return;
+    }
+
     try {
         const foundSciencePerformances = await SciencePerformanceDB.find({
             scienceId: req.body.scienceId,
@@ -32,6 +39,13 @@ module.exports.createSciencePerformance = async (req, res) => {
 }
 
 module.exports.removeSciencePerformance = async (req, res) => {
+    const user = User.toModel(req.user)
+
+    if (!user.isAdmin) {
+        errorHandler(res, "Отказано в доступе!");
+        return;
+    }
+
     try {
         const academicPerformances = await AcademicPerformanceDB.find({
             sciencePerformanceId: req.params.id

@@ -114,8 +114,8 @@ export default {
         cancelText: "Отменить",
         submitText: `Удалить`,
         submitColor: "red",
-        onSubmit: () => {
-          this.$store.dispatch("usersModule/deleteUser", user)
+        onSubmit: async () => {
+          await this.$store.dispatch("usersModule/deleteUser", user)
         },
       });
     },
