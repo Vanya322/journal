@@ -42,6 +42,7 @@ import GroupsPage from "../views/GroupsPage";
 import StudentsPage from "../views/StudentsPage";
 import SciencesPage from "../views/SciencesPage";
 import UsersPage from "../views/UsersPage";
+import SchedulePage from "../views/SchedulePage";
 
 export default {
   name: "NavigationDrawer",
@@ -71,6 +72,7 @@ export default {
         StudentsPage,
         SciencesPage,
         UsersPage,
+        SchedulePage,
       ].map((it) => it.routing)
         .filter((it) => it.hasAccess(this.user));
     },
