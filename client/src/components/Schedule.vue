@@ -1,6 +1,6 @@
 <template>
   <div>
-    {{schedule}}
+    {{schedules}}
   </div>
 </template>
 
@@ -11,11 +11,11 @@ export default {
   name: "Schedule",
 
   computed: {
-    ...mapState("scheduleModule", ["schedule"])
+    ...mapState("schedulesModule", ["schedules"])
   },
 
   mounted() {
-    this.$store.dispatch("scheduleModule/loadSchedule", {
+    this.$store.dispatch("schedulesModule/loadSchedule", {
       user: "Иб-341",
       start: "23.01.2022",
       end: "30.06.2022",
