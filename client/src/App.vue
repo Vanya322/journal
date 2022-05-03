@@ -144,7 +144,7 @@ export default {
 ::-webkit-scrollbar-thumb {
   border-radius: 10px;
   --webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-  background-color: #2196f3;
+  background-color: var(--v-primary-base);
 }
 
 .textfield-without-border {

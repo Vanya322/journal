@@ -1,7 +1,7 @@
 <template>
   <div class="academic-performance">
     <div
-      v-if="mode === VIEW_MODE"
+      v-show="mode === VIEW_MODE"
       class="performance"
       @click="mode = EDIT_MODE"
     >
@@ -14,17 +14,16 @@
         @input="newPerformance = $event"
       ></v-text-field>
       <v-icon
-        medium
+        small
         class="mr-2"
-        @click="apply()"
+        @click="apply"
         color="green"
-        :disabled="!newPerformance"
+        :disabled="newPerformance === academicPerformance.performance"
       >mdi-check</v-icon>
       <v-icon
-        v-if="academicPerformance.id && academicPerformance.performance"
-        medium
+        small
         color="red"
-        @click="cancel()"
+        @click="cancel"
       >mdi-close</v-icon>
     </div>
     <div v-if="mode === LOADING_MODE">
@@ -53,14 +52,7 @@ export default {
 
   watch: {
     academicPerformance() {
-      if(this.mode === LOADING_MODE && !this.academicPerformance.performance) {
-        return;
-      }
-      if(this.academicPerformance.id && this.academicPerformance.performance) {
-        this.mode = VIEW_MODE;
-      } else {
-        this.mode = EDIT_MODE;
-      }
+      this.mode = VIEW_MODE;
     }
   },
 
@@ -69,7 +61,7 @@ export default {
     EDIT_MODE,
     LOADING_MODE,
 
-    mode: undefined,
+    mode: VIEW_MODE,
     newPerformance: undefined,
   }),
 
@@ -97,11 +89,7 @@ export default {
   },
 
   mounted() {
-    if(this.academicPerformance.id && this.academicPerformance.performance) {
-      this.mode = VIEW_MODE;
-    } else {
-      this.mode = EDIT_MODE;
-    }
+    this.mode = VIEW_MODE;
   }
 }
 </script>
@@ -115,6 +103,8 @@ export default {
   }
   .performance {
     font-size: 20px;
+    min-height: 30px;
+    min-width: 30px;
   }
 }
 </style>

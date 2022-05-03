@@ -30,6 +30,7 @@ export const dismissAction = {
 export const dateTimeMomentFormat = "MMM Do YY HH:mm:ss";
 export const dateMomentFormat = "MMM Do YY";
 export const defaultDateFormat = "YYYY-MM-DD";
+export const defaultScheduleFormat = "DD.MM.YYYY";
 
 export const setLocalStorageData = (key, data) => {
     localStorage.setItem(key, data);

@@ -6,16 +6,25 @@ export default {
   namespaced: true,
   state: {
     schedules: [],
+    currentLoading: false,
   },
   mutations: {
     updateSchedules(state, schedules) {
       state.schedules = schedules.map(it => Schedule.fromDto(it));
-      console.log(schedules)
-      console.log(state.schedules)
     },
+
+    startLoading(state) {
+      state.currentLoading = true;
+    },
+
+    endLoading(state) {
+      state.currentLoading = false;
+    }
   },
   actions: {
     async loadSchedule({ commit }, { user, start, end }) {
+      commit("startLoading");
+
       const params = new URLSearchParams();
 
       params.set("user", user);
@@ -34,10 +43,11 @@ export default {
           params,
         });
 
-        commit("updateSchedules", schedulesDto.data.GetRaspGroupResult.RaspItem)
+        commit("updateSchedules", schedulesDto.data.GetRaspGroupResult.RaspItem || [])
       } catch (e) {
         console.log(e)
       }
+      commit("endLoading");
     }
   }
 }

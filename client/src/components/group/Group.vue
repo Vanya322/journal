@@ -166,6 +166,7 @@ export default {
   computed: {
     ...mapState("coreModule", ["drawer"]),
     ...mapState("userModule", ["user"]),
+
     dateHeaders() {
       return [...this.headers].splice(1, this.headers.length);
     },
@@ -248,6 +249,7 @@ export default {
       }
 
       this.$refs.dateRangeMenu.save(range);
+      this.loadTargetGroup();
     },
 
     getCorrectHeaderDates() {
