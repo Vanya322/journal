@@ -131,8 +131,8 @@
       :group="targetGroup"
       @onUpdate="loadTargetGroup"
     />
-    <AddStudentDialog ref="addStudentDialog" @onUpdate="loadTargetGroup" />
-    <ConfirmationDialog ref="confirmationDialog" />
+    <AddStudentDialog v-if="user.isAdmin" ref="addStudentDialog" @onUpdate="loadTargetGroup" />
+    <ConfirmationDialog v-if="user.isAdmin" ref="confirmationDialog" />
   </v-container>
 </template>
 
@@ -289,7 +289,6 @@ export default {
 
   mounted() {
     this.loadTargetGroup();
-    this.$store.dispatch("sciencesModule/loadPage");
   }
 }
 </script>

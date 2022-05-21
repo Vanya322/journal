@@ -75,6 +75,10 @@ export default {
       })
       this.$emit("onUpdate");
       this.open = false;
+    },
+
+    mounted() {
+      this.$store.dispatch("sciencesModule/loadPage");
     }
   }
 }

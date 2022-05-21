@@ -12,12 +12,12 @@
           v-model="searchString"
           clerable
         ></v-text-field>
-        <v-btn color="primary" @click="openEditDialog({})">
+        <v-btn color="primary" @click="openEditDialog({})" v-if="user.isAdmin">
           Добавить группу
         </v-btn>
       </v-toolbar>
       <v-card-text>
-        <div class="d-flex">
+        <div class="d-flex flex-wrap">
           <v-card
             v-for="group in displayGroups"
             :key="group.id"
